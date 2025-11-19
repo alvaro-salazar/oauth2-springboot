@@ -2,7 +2,7 @@
 
 Microservicio Spring Boot que implementa autenticación y autorización con **OAuth 2.0** y **OIDC** (OpenID Connect), siguiendo las mejores prácticas de la industria.
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenido
 
 - [Descripción](#descripción)
 - [Inicio Rápido](#inicio-rápido)
@@ -15,7 +15,7 @@ Microservicio Spring Boot que implementa autenticación y autorización con **OA
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Mejoras Futuras](#mejoras-futuras)
 
-## 🎯 Descripción
+## Descripción
 
 Este microservicio actúa como un **Resource Server** en el flujo OAuth 2.0/OIDC. Su función principal es:
 
@@ -41,7 +41,7 @@ Este microservicio actúa como un **Resource Server** en el flujo OAuth 2.0/OIDC
                          └─────────────┘
 ```
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 > **📖 Para instrucciones detalladas paso a paso, ver [QUICK_START.md](QUICK_START.md)**
 
@@ -74,7 +74,7 @@ curl http://localhost:8081/api/v1/actuator/health
 - `testuser` / `test123` (rol: USER)
 - `admin` / `admin123` (rol: ADMIN, USER)
 
-## ⚙️ Configuración
+## Configuración
 
 ### Variables de Entorno
 
@@ -108,7 +108,7 @@ DB_PASSWORD=postgres
 ./get-keycloak-secret.sh
 ```
 
-## 📡 Endpoints
+## Endpoints
 
 ### API Principal
 
@@ -137,7 +137,7 @@ DB_PASSWORD=postgres
 | GET | `/swagger-ui.html` | Swagger UI interactivo |
 | GET | `/api-docs` | OpenAPI JSON |
 
-## 🔐 Autenticación y Tokens
+## Autenticación y Tokens
 
 ### Tipos de Tokens
 
@@ -162,6 +162,7 @@ Keycloak genera tokens que siguen los estándares **OAuth 2.0** y **OIDC (OpenID
 curl -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "client_id=spring-auth-service" \
+  -d "client_secret=<VER PASO 3.3 DE INICIO RAPIDO>"
   -d "username=testuser" \
   -d "password=test123" \
   -d "grant_type=password"
@@ -229,7 +230,7 @@ curl -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
 
 **Nota**: El `refresh_token` se usa **directamente con Keycloak**, no con el auth-service. El auth-service solo valida `access_token` JWT.
 
-## 🔄 Integración con Keycloak
+## Integración con Keycloak
 
 ### Sincronización Automática de Usuarios
 
@@ -297,7 +298,7 @@ El cliente `spring-auth-service` en Keycloak tiene:
 3. **Refrescar Token**: Si expira, usa "Refrescar Token"
 4. **Crear Usuario**: Usa el token de admin para crear usuarios
 
-## 📊 Observabilidad
+## Observabilidad
 
 ### Health Check
 
@@ -323,7 +324,7 @@ scrape_configs:
       - targets: ['localhost:8081']
 ```
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 spring-auth-service/
@@ -345,7 +346,7 @@ spring-auth-service/
 └── README.md                # Este archivo
 ```
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 - **Spring Boot 3.2.0** - Framework principal
 - **Spring Security OAuth2 Resource Server** - Validación JWT
@@ -356,11 +357,11 @@ spring-auth-service/
 - **Swagger/OpenAPI 3** - Documentación API
 - **Spring Boot Actuator** - Observabilidad
 
-## 🚧 Mejoras Futuras
+## Mejoras Futuras
 
 Ver [SECURITY.md](SECURITY.md) para mejoras de seguridad recomendadas para producción.
 
-## 🔗 Comunicación entre Microservicios
+## Comunicación entre Microservicios
 
 Para comunicación **service-to-service**, usa **Client Credentials Grant** para obtener un **Service Account Token**.
 
@@ -375,7 +376,7 @@ curl -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
 
 Ver [MICROSERVICES_COMMUNICATION.md](MICROSERVICES_COMMUNICATION.md) para detalles completos.
 
-## 🏗️ Arquitectura: API Gateway vs Resource Server
+## Arquitectura: API Gateway vs Resource Server
 
 ¿Dónde validar tokens? ¿En el API Gateway o en cada microservicio?
 
@@ -386,7 +387,7 @@ Ver [MICROSERVICES_COMMUNICATION.md](MICROSERVICES_COMMUNICATION.md) para detall
 
 Ver [API_GATEWAY_PATTERN.md](API_GATEWAY_PATTERN.md) para comparación detallada, ventajas/desventajas, y cuándo usar cada uno.
 
-## 🔍 Validación de Tokens
+## Validación de Tokens
 
 **¿Necesitas un endpoint `/validate`?** 
 
@@ -394,7 +395,7 @@ Ver [API_GATEWAY_PATTERN.md](API_GATEWAY_PATTERN.md) para comparación detallada
 
 Ver [TOKEN_VALIDATION.md](TOKEN_VALIDATION.md) para explicación detallada de cómo funciona la validación automática.
 
-## 📚 Recursos Adicionales
+## Recursos Adicionales
 
 - [QUICK_START.md](QUICK_START.md) - **Guía completa paso a paso para iniciar desde cero**
 - [TOKENS.md](TOKENS.md) - Explicación detallada de tipos de tokens (OAuth 2.0, OIDC, JWT)
@@ -407,10 +408,9 @@ Ver [TOKEN_VALIDATION.md](TOKEN_VALIDATION.md) para explicación detallada de c�
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
 - [OpenID Connect Specification](https://openid.net/specs/openid-connect-core-1_0.html)
 
-## 📝 Licencia
+## Licencia
 
-Este proyecto está bajo la Licencia Apache 2.0.
+Este proyecto está bajo la Licencia MIT
 
 ---
 
-**Desarrollado con ❤️ para estudiantes de desarrollo de software**
