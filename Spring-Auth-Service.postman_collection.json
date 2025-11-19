@@ -1,0 +1,977 @@
+{
+	"info": {
+		"_postman_id": "spring-auth-service-collection",
+		"name": "Spring Auth Service",
+		"description": "Colección de pruebas para el microservicio Spring Auth Service con OAuth 2.0/OIDC",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación - Keycloak",
+			"item": [
+				{
+					"name": "Obtener Token - testuser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"access_token\", jsonData.access_token);",
+									"    pm.environment.set(\"token_type\", jsonData.token_type);",
+									"    ",
+									"    // Guardar refresh_token si está disponible",
+									"    if (jsonData.refresh_token) {",
+									"        pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+									"        console.log('Refresh token guardado');",
+									"    }",
+									"    ",
+									"    // Decodificar JWT para obtener información de expiración",
+									"    var tokenParts = jsonData.access_token.split('.');",
+									"    if (tokenParts.length === 3) {",
+									"        var payload = JSON.parse(atob(tokenParts[1]));",
+									"        var expiresAt = new Date(payload.exp * 1000);",
+									"        var expiresIn = jsonData.expires_in || 'N/A';",
+									"        console.log('Token guardado exitosamente');",
+									"        console.log('Token expira en: ' + expiresIn + ' segundos');",
+									"        console.log('Token expira a las: ' + expiresAt.toLocaleString());",
+									"        pm.environment.set(\"token_expires_at\", expiresAt.toISOString());",
+									"    } else {",
+									"        console.log('Token guardado exitosamente');",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access_token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('access_token');",
+									"});",
+									"",
+									"pm.test(\"Token expires_in is present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('expires_in');",
+									"    console.log('Token válido por: ' + jsonData.expires_in + ' segundos');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "spring-auth-service",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text",
+									"description": "Obtener el secret desde Keycloak: Clients > spring-auth-service > Credentials"
+								},
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{keycloak_url}}/realms/master/protocol/openid-connect/token",
+							"host": [
+								"{{keycloak_url}}"
+							],
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Obtiene un token JWT para el usuario testuser (rol: USER)"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Token - admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"access_token_admin\", jsonData.access_token);",
+									"    pm.environment.set(\"token_type\", jsonData.token_type);",
+									"    ",
+									"    // Guardar refresh_token si está disponible",
+									"    if (jsonData.refresh_token) {",
+									"        pm.environment.set(\"refresh_token_admin\", jsonData.refresh_token);",
+									"        console.log('Refresh token de admin guardado');",
+									"    }",
+									"    ",
+									"    // Decodificar JWT para obtener información de expiración",
+									"    var tokenParts = jsonData.access_token.split('.');",
+									"    if (tokenParts.length === 3) {",
+									"        var payload = JSON.parse(atob(tokenParts[1]));",
+									"        var expiresAt = new Date(payload.exp * 1000);",
+									"        var expiresIn = jsonData.expires_in || 'N/A';",
+									"        console.log('Token de admin guardado exitosamente');",
+									"        console.log('Token expira en: ' + expiresIn + ' segundos');",
+									"        console.log('Token expira a las: ' + expiresAt.toLocaleString());",
+									"        pm.environment.set(\"token_admin_expires_at\", expiresAt.toISOString());",
+									"    } else {",
+									"        console.log('Token de admin guardado exitosamente');",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access_token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('access_token');",
+									"});",
+									"",
+									"pm.test(\"Token expires_in is present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('expires_in');",
+									"    console.log('Token válido por: ' + jsonData.expires_in + ' segundos');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "spring-auth-service",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{keycloak_url}}/realms/master/protocol/openid-connect/token",
+							"host": [
+								"{{keycloak_url}}"
+							],
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Obtiene un token JWT para el usuario admin (rol: ADMIN, USER)"
+					},
+					"response": []
+				},
+				{
+					"name": "Refrescar Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    ",
+									"    // Actualizar access_token (puede ser de testuser o admin)",
+									"    if (pm.environment.get(\"refresh_token\") === pm.environment.get(\"refresh_token_admin\")) {",
+									"        // Si ambos refresh tokens son iguales, actualizar ambos",
+									"        pm.environment.set(\"access_token\", jsonData.access_token);",
+									"        pm.environment.set(\"access_token_admin\", jsonData.access_token);",
+									"    } else if (pm.environment.get(\"refresh_token\") && pm.environment.get(\"refresh_token\") === pm.request.body.urlencoded.find(p => p.key === 'refresh_token')?.value) {",
+									"        pm.environment.set(\"access_token\", jsonData.access_token);",
+									"    } else if (pm.environment.get(\"refresh_token_admin\") && pm.environment.get(\"refresh_token_admin\") === pm.request.body.urlencoded.find(p => p.key === 'refresh_token')?.value) {",
+									"        pm.environment.set(\"access_token_admin\", jsonData.access_token);",
+									"    }",
+									"    ",
+									"    // Actualizar refresh_token si viene uno nuevo",
+									"    if (jsonData.refresh_token) {",
+									"        // Determinar cuál refresh token se usó",
+									"        var usedRefreshToken = pm.request.body.urlencoded.find(p => p.key === 'refresh_token')?.value;",
+									"        if (usedRefreshToken === pm.environment.get(\"refresh_token\")) {",
+									"            pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+									"        }",
+									"        if (usedRefreshToken === pm.environment.get(\"refresh_token_admin\")) {",
+									"            pm.environment.set(\"refresh_token_admin\", jsonData.refresh_token);",
+									"        }",
+									"    }",
+									"    ",
+									"    // Decodificar JWT para obtener información de expiración",
+									"    var tokenParts = jsonData.access_token.split('.');",
+									"    if (tokenParts.length === 3) {",
+									"        var payload = JSON.parse(atob(tokenParts[1]));",
+									"        var expiresAt = new Date(payload.exp * 1000);",
+									"        var expiresIn = jsonData.expires_in || 'N/A';",
+									"        console.log('Token refrescado exitosamente');",
+									"        console.log('Nuevo token expira en: ' + expiresIn + ' segundos');",
+									"        console.log('Nuevo token expira a las: ' + expiresAt.toLocaleString());",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access_token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('access_token');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "spring-auth-service",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{refresh_token}}",
+									"type": "text",
+									"description": "Usa refresh_token o refresh_token_admin según corresponda"
+								},
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{keycloak_url}}/realms/master/protocol/openid-connect/token",
+							"host": [
+								"{{keycloak_url}}"
+							],
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Renueva el access_token usando el refresh_token. Útil cuando el access_token expira (después de 1 hora). No necesitas volver a ingresar usuario/contraseña."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para obtener tokens JWT desde Keycloak"
+		},
+		{
+			"name": "2. Profile - Perfil del Usuario",
+			"item": [
+				{
+					"name": "Get Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has username\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"});",
+									"",
+									"pm.test(\"Response has email\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/profile",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Obtiene el perfil del usuario autenticado desde el token JWT"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Token Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has token info\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/profile/token-info",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"profile",
+								"token-info"
+							]
+						},
+						"description": "Obtiene información detallada del token JWT (útil para debugging)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados con el perfil del usuario autenticado"
+		},
+		{
+			"name": "3. Users - Gestión de Usuarios",
+			"item": [
+				{
+					"name": "Get All Users (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token_admin}}",
+									"type": "string",
+									"description": "Requiere token de usuario con rol ADMIN"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/users",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Lista todos los usuarios. Requiere rol ADMIN."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/users/1",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						},
+						"description": "Obtiene un usuario por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has created user\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"    ",
+									"    // Guardar el ID para usar en otras requests",
+									"    pm.environment.set(\"created_user_id\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token_admin}}",
+									"type": "string",
+									"description": "Requiere token de usuario con rol ADMIN"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"newuser@example.com\",\n    \"fullName\": \"New User\",\n    \"active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_service_url}}/users",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Crea un nuevo usuario. Requiere rol ADMIN."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User was updated\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.fullName).to.equal(\"Updated User Name\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"updated@example.com\",\n    \"fullName\": \"Updated User Name\",\n    \"active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_service_url}}/users/{{created_user_id}}",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users",
+								"{{created_user_id}}"
+							]
+						},
+						"description": "Actualiza un usuario existente. Usa el ID del usuario creado anteriormente."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token_admin}}",
+									"type": "string",
+									"description": "Requiere token de usuario con rol ADMIN"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/users/{{created_user_id}}",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users",
+								"{{created_user_id}}"
+							]
+						},
+						"description": "Elimina un usuario. Requiere rol ADMIN."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de usuarios (CRUD)"
+		},
+		{
+			"name": "4. Observabilidad - Actuator",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Service is UP\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.equal(\"UP\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/actuator/health",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Verifica el estado de salud del servicio"
+					},
+					"response": []
+				},
+				{
+					"name": "Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/actuator/info",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"actuator",
+								"info"
+							]
+						},
+						"description": "Obtiene información del servicio"
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/actuator/metrics",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"actuator",
+								"metrics"
+							]
+						},
+						"description": "Lista todas las métricas disponibles"
+					},
+					"response": []
+				},
+				{
+					"name": "Prometheus Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/actuator/prometheus",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"actuator",
+								"prometheus"
+							]
+						},
+						"description": "Métricas en formato Prometheus"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de observabilidad (Spring Boot Actuator)"
+		},
+		{
+			"name": "5. Documentación - Swagger",
+			"item": [
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/swagger-ui.html",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"swagger-ui.html"
+							]
+						},
+						"description": "Interfaz Swagger UI para probar los endpoints interactivamente"
+					},
+					"response": []
+				},
+				{
+					"name": "OpenAPI JSON",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/api-docs",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"api-docs"
+							]
+						},
+						"description": "Especificación OpenAPI en formato JSON"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de documentación de la API"
+		},
+		{
+			"name": "6. Tests de Autorización",
+			"item": [
+				{
+					"name": "Get All Users sin ADMIN (debe fallar)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403 (Forbidden)\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Error message indicates insufficient permissions\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string",
+									"description": "Token de testuser (solo rol USER, no ADMIN)"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/users",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Intenta acceder a un endpoint que requiere ADMIN usando un token de USER. Debe retornar 403."
+					},
+					"response": []
+				},
+				{
+					"name": "Request sin token (debe fallar)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/profile",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Intenta acceder sin token. Debe retornar 401."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests para validar que la autorización funciona correctamente"
+		}
+	],
+	"variable": [
+		{
+			"key": "keycloak_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "auth_service_url",
+			"value": "http://localhost:8081/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "client_secret",
+			"value": "",
+			"type": "string",
+			"description": "Obtener desde Keycloak: Clients > spring-auth-service > Credentials > Secret"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string",
+			"description": "Se llena automáticamente al ejecutar 'Obtener Token - testuser'"
+		},
+		{
+			"key": "access_token_admin",
+			"value": "",
+			"type": "string",
+			"description": "Se llena automáticamente al ejecutar 'Obtener Token - admin'"
+		},
+		{
+			"key": "created_user_id",
+			"value": "",
+			"type": "string",
+			"description": "Se llena automáticamente al crear un usuario"
+		}
+	]
+}
+
